@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlauncher.dao.ConfiDao">
+    <!--listConfi-->
+    <select id="listConfi" parameterType="String" resultMap="confiRM">
+        SELECT * FROM tiangong_draft.configuration
+    </select>
+
+    <!--getConfi-->
+    <select id="getConfi" parameterType="String" resultType="com.xlauncher.entity.Configuration">
+        SELECT * FROM tiangong_draft.configuration WHERE options=#{options}
+    </select>
+
+    <!--insertConfi-->
+    <insert id="insertConfi" parameterType="com.xlauncher.entity.Configuration">
+        INSERT INTO tiangong_draft.configuration(options, params) VALUES (#{options},#{params,javaType=Map,jdbcType=VARCHAR})
+    </insert>
+
+    <!--updateConfi-->
+    <update id="updateConfi" parameterType="String">
+        UPDATE tiangong_draft.configuration
+        <set>
+            <if test="params !=null">
+                params=#{params,javaType=Map,jdbcType=VARCHAR},
+            </if>
+        </set>
+         WHERE options=#{options}
+    </update>
+
+
+    <resultMap id="confiRM" type="com.xlauncher.entity.Configuration">
+        <id property="id" column="id"/>
+        <result property="options" column="options"/>
+        <result typeHandler="com.xlauncher.util.MapTypeHandler" property="params" javaType="java.util.Map" column="params" jdbcType="VARCHAR"/>
+    </resultMap>
+</mapper>

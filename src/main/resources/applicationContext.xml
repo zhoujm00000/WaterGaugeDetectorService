@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <!-- ********************Spring配置************************** -->
+    <!-- 自动扫描web包，将带有注解的类，纳入spring容器管理 -->
+    <!-- Spring 容器初始化的时候，会扫描 com.eduoinfo.finances.bank.web下 标有 (@Component,@Service,@Controller,@Repository) 注解的 类 纳入spring容器管理
+    在类上 ，使用以下注解，实现bean 的声明
+    @Component 泛指组件，当组件不好归类的时候，我们可以使用这个注解进行标注。
+    @Service 用于标注业务层组件
+    @Controller 用于标注控制层组件（如srping mvc的controller,struts中的action）
+    @Repository 用于标注数据访问组件，即DAO组件
+    示例：
+    @Controller
+    @RequestMapping(value = "/test")
+    public class TestController {
+    }
+    在类的成员变量上,使用以下注解，实现属性的自动装配
+    @Autowired : 按类 的 类型进行装配
+    @Resource (推荐) : 1 如果同时指定了name和type，则从Spring上下文中找到唯一匹配的bean进行装配，找不到则抛出异常
+        2. 如果指定了name，则从上下文中查找名称（userId）匹配的bean进行装配，找不到则抛出异常
+        3.如果指定了type，则从上下文中找到类型匹配的唯一bean进行装配，找不到或者找到多个，都会抛出异常
+        4.如果既没有指定name，又没有指定type，则自动按照byName方式进行装配；如果没有匹配，则回退为一个原始类型进行匹配，如果匹配则自动装配；
+    @Resource注解在字段上，这样就不用写setter方法了，并且这个注解是属于J2EE的，减少了与spring的耦合。
+    示例：
+    @Resource
+    private TestServiceImpl testServiceImpl;
+    -->
+    <context:component-scan base-package="com.xlauncher.dao, com.xlauncher.service, com.xlauncher.util, com.xlauncher.web"/>
+    <!-- ******************************Spring Mybatis配置******************************** -->
+    <!-- 引入配置文件properties -->
+    <!-- 配置JDBC文件 -->
+    <util:properties location="classpath:jdbc.properties" id="jdbc"/>
+
+    <!-- dataSource 配置 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!-- 基本属性url、User、password -->
+        <property name="driverClassName" value="#{jdbc.driver}"/>
+        <property name="url" value="#{jdbc.url}"/>
+        <property name="username" value="#{jdbc.name}"/>
+        <property name="password" value="#{jdbc.password}"/>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="#{jdbc.initialSize}"/>
+        <property name="minIdle" value="#{jdbc.minIdle}"/>
+        <property name="maxActive" value="#{jdbc.maxActive}"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="#{jdbc.maxWait}"/>
+        <!-- 配置间隔多久进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="#{jdbc.timeBetweenEvictionRunsMillis}"/>
+        <!-- 配置一个连接池在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="#{jdbc.minEvictableIdleTimeMillis}"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <!-- 打开PSCache，并指定每个连接上的PSCache的大小 -->
+        <property name="poolPreparedStatements" value="false"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat"/>
+    </bean>
+
+    <!--声明TypeHandler bean-->
+    <bean id="mapTypeHandler" class="com.xlauncher.util.MapTypeHandler"/>
+
+    <!-- 托管SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- mybatis配置文件地址mybatis-config.xml -->
+        <!--<property name="configLocation" value="classpath:mybatis-config.xml"/>-->
+        <!-- 自动扫描映射文件mapper.xml，如果指定此项，在mybatis-config.xml中对于mapper的指定可以省略 -->
+
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+
+        <!-- 指定数据源，上文定义的数据源：dataSource，如果指定此项，在mybatis-config.xml中对于environments的配置可以省略 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!--&lt;!&ndash; 自动给实体类取别名 &ndash;&gt;-->
+        <!--<property name="typeAliasesPackage" value="com.xlauncher.com.xlauncher.entity"/>-->
+        <!--typeHandler注入-->
+        <property name="typeHandlers" ref="mapTypeHandler"/>
+    </bean>
+
+    <!-- 自动生成dao层实现，DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.xlauncher.dao"/>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <!-- 对dataSource数据源进行事物管理 -->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 配置基于注解的声明式事务 -->
+    <!-- 开启事务管理，启用对事物注解的支持 -->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
+    <!-- spring调用配置文件-->
+    <context:property-placeholder location="classpath*:model.properties"/>
+    <!--<util:properties id="configProperties" location="classpath:model.properties"/>-->
+</beans>

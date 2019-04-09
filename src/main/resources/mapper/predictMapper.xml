@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlauncher.dao.PredictDao">
+    <!--单条预测数据-->
+    <select id="getPredict" parameterType="int" resultMap="predictRM">
+        SELECT * FROM tiangong_draft.predict
+        WHERE id=#{id}
+    </select>
+
+    <!--listPredict-->
+    <select id="listPredict" parameterType="String" resultMap="preRM">
+        SELECT * FROM tiangong_draft.predict
+        <where>
+            <if test="upStartTime != 'undefined' and upStartTime != '' ">
+                collect_time &gt;= #{upStartTime}
+            </if>
+            <if test="lowStartTime != 'undefined' and lowStartTime != '' ">
+                AND collect_time &lt;= #{lowStartTime}
+            </if>
+            <if test="sid != 'undefined' and sid != '' ">
+                AND SID LIKE concat('%',#{sid},'%')
+            </if>
+            <if test="identifyDescription != 'undefined' and identifyDescription != '' ">
+                AND identify_description = #{identifyDescription}
+            </if>
+        </where>
+        ORDER BY collect_time DESC limit #{number},10
+    </select>
+
+    <select id="countPredict" parameterType="String" resultType="int">
+        SELECT count(*) FROM tiangong_draft.predict
+        <where>
+            <if test="upStartTime != 'undefined' and upStartTime != '' ">
+                collect_time &gt;= #{upStartTime}
+            </if>
+            <if test="lowStartTime != 'undefined' and lowStartTime != '' ">
+                AND collect_time &lt;= #{lowStartTime}
+            </if>
+            <if test="sid != 'undefined' and sid != '' ">
+                AND SID LIKE concat('%',#{sid},'%')
+            </if>
+            <if test="identifyDescription != 'undefined' and identifyDescription != '' ">
+                AND identify_description = #{identifyDescription}
+            </if>
+        </where>
+    </select>
+
+    <!--最近num+1天历史预测数据总数-->
+    <select id="countPredictByStatusNum" parameterType="int" resultType="int">
+        SELECT count(*) FROM tiangong_draft.predict
+        WHERE status=#{status}
+        AND DATE_SUB(CURDATE(), INTERVAL #{num} DAY) &lt;= date(collect_time)
+    </select>
+
+    <!--所有历史预测数据总数-->
+    <select id="countPredictByStatus" parameterType="int" resultType="int">
+        SELECT count(*) FROM tiangong_draft.predict
+        WHERE status=#{status}
+    </select>
+
+    <!--预测正确性统计-->
+    <select id="countPredictByCheck" resultType="int">
+        SELECT count(*) FROM tiangong_draft.predict
+        WHERE predict.check !="" AND status=0
+    </select>
+    <select id="countPredictTrue" resultType="int">
+        SELECT count(*) FROM tiangong_draft.predict
+        WHERE status=0
+    </select>
+
+    <!--insertPredict-->
+    <!--keyProperty="id" 表示将自增长后的Id赋值给实体类中的id字段-->
+    <!--useGeneratedKeys="true" 设置是否使用JDBC的getGenereatedKeys方法获取主键并赋值到keyProperty设置的领域模型属性中-->
+    <insert id="insertPredict" useGeneratedKeys="true" keyProperty="id" parameterType="com.xlauncher.entity.Predict">
+        INSERT INTO tiangong_draft.predict(collect_time, channel, SID, source, identify, status, picture,identify_description)
+         VALUES (#{collectTime},#{channel},#{sid},#{source},#{identify},#{status},#{picture},#{identifyDescription})
+    </insert>
+
+    <!-- 根据指定的告警事件编号获取图片的资源信息，以java.sql.Blob形式返回 -->
+    <select id="getImgData" parameterType="int" resultMap="predictRM">
+        SELECT source from predict WHERE id=#{id}
+    </select>
+    <!-- 根据指定的告警事件编号获取图片的资源信息，以java.sql.Blob形式返回 -->
+    <select id="getPicData" parameterType="int" resultMap="predictRM">
+        SELECT picture from predict WHERE id=#{id}
+    </select>
+    <!-- 获取最新时间-->
+    <select id="getCollectTime1" resultType="String">
+        SELECT collect_time from predict ORDER BY collect_time DESC limit 1
+    </select>
+    <!--查询该通道是否已经存在-->
+    <select id="predictExistence" parameterType="String" resultType="int">
+        SELECT count(*) from predict WHERE collect_time=#{collectTime} AND SID=#{sid}
+    </select>
+
+    <!--updatePredict-->
+    <update id="updatePredict" parameterType="com.xlauncher.entity.Predict">
+        UPDATE tiangong_draft.predict SET predict.check=#{check}, check_description=#{checkDescription}
+        WHERE id=#{id}
+    </update>
+
+    <!--得到半年以上的数据-->
+    <!-- PERIOD_DIFF(P1,P2)函数返回在时期P1和P2之间月数，P1和P2应该以格式YYMM或YYYYMM。注意，时期参数P1和P2不是日期值。-->
+    <select id="getHalfAllYearPredict" resultType="com.xlauncher.entity.Predict">
+        SELECT * from predict WHERE status=1
+        AND PERIOD_DIFF( date_format( now() , '%Y%m' ) , date_format( collect_time, '%Y%m' ) ) >=6
+    </select>
+    <select id="getHalfYearPredict" resultType="com.xlauncher.entity.Predict">
+        SELECT * from predict WHERE status=1
+        AND source!=""
+        AND PERIOD_DIFF( date_format( now() , '%Y%m' ) , date_format( collect_time, '%Y%m' ) ) >=6
+    </select>
+
+    <!--根据时间获取预测数据getPredictByTime-->
+    <select id="getPredictByTime" resultMap="preRM">
+        SELECT * from predict WHERE collect_time > #{startTime}
+    </select>
+    <!--清空source数据-->
+    <update id="emptySource" parameterType="int">
+        UPDATE predict SET source=NULL WHERE id=#{id}
+    </update>
+
+    <resultMap id="preRM" type="com.xlauncher.entity.Predict">
+        <id property="id" column="id"/>
+        <result property="collectTime" column="collect_time"/>
+        <result property="channel" column="channel"/>
+        <result property="sid" column="SID"/>
+        <result property="identify" column="identify"/>
+        <result property="check" column="check"/>
+        <result property="status" column="status"/>
+        <result property="identifyDescription" column="identify_description"/>
+        <result property="checkDescription" column="check_description"/>
+    </resultMap>
+
+    <resultMap id="predictRM" type="com.xlauncher.entity.Predict">
+        <id property="id" column="id"/>
+        <result property="collectTime" column="collect_time"/>
+        <result property="channel" column="channel"/>
+        <result property="sid" column="SID"/>
+        <result property="identify" column="identify"/>
+        <result property="check" column="check"/>
+        <result property="source" column="source"/>
+        <result property="status" column="status"/>
+        <result property="picture" column="picture"/>
+        <result property="identifyDescription" column="identify_description"/>
+        <result property="checkDescription" column="check_description"/>
+    </resultMap>
+</mapper>

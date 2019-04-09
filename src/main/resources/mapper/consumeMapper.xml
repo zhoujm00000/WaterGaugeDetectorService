@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlauncher.dao.ConsumeDao">
+    <!--avgConsumeTimeByDay-->
+    <select id="avgConsumeTimeByDay" parameterType="int" resultType="String">
+        SELECT AVG(consume_time) FROM tiangong_draft.consume
+        WHERE DATEDIFF(start_time, NOW())=#{num}
+    </select>
+
+    <!--maxConsumeTimeByDay-->
+    <select id="maxConsumeTimeByDay" parameterType="int" resultType="String">
+        SELECT MAX(consume_time) FROM tiangong_draft.consume
+        WHERE DATEDIFF(start_time, NOW())=#{num}
+    </select>
+
+    <!--minConsumeTimeByDay-->
+    <select id="minConsumeTimeByDay" parameterType="int" resultType="String">
+        SELECT MIN(consume_time) FROM tiangong_draft.consume
+        WHERE DATEDIFF(start_time, NOW())=#{num}
+    </select>
+
+    <!--insertConsume-->
+    <insert id="insertConsume" parameterType="com.xlauncher.entity.Consume">
+        INSERT INTO tiangong_draft.consume(start_time, consume_time)
+        VALUES (#{startTime},#{consumeTime})
+    </insert>
+
+    <!--emptyMonth-->
+    <delete id="emptyMonth">
+        DELETE FROM tiangong_draft.consume
+        WHERE DATEDIFF(start_time, NOW()) = -31
+    </delete>
+    <!--emptyMonth-->
+    <select id="countMonth" resultType="int">
+        SELECT count(*) FROM tiangong_draft.consume
+        WHERE DATEDIFF(start_time, NOW()) = -31
+    </select>
+
+    <resultMap id="consumeRM" type="com.xlauncher.entity.Consume">
+        <id property="id" column="id"/>
+        <result property="startTime" column="start_time"/>
+        <result property="consumeTime" column="consume_time"/>
+    </resultMap>
+</mapper>

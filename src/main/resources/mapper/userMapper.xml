@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlauncher.dao.UserDao">
+    <!--getAccount-->
+    <select id="getUserByAccount" parameterType="String" resultMap="userRM">
+        SELECT * FROM tiangong_draft.user WHERE account=#{account}
+    </select>
+
+    <!--saveToken-->
+    <update id="saveToken" parameterType="String">
+        UPDATE tiangong_draft.user SET token=#{token} WHERE account="admin"
+    </update>
+
+    <!--checkToken-->
+    <select id="checkToken" parameterType="String" resultMap="userRM">
+        select * from tiangong_draft.user WHERE token=#{token}
+    </select>
+
+    <!--deleteToken-->
+    <update id="deleteToken" parameterType="String">
+        UPDATE tiangong_draft.user SET token=NULL WHERE token=#{token}
+    </update>
+    <!--updateToken-->
+    <update id="updateToken" parameterType="com.xlauncher.entity.User">
+        UPDATE tiangong_draft.user SET password=#{password} WHERE account=#{account} AND token=#{token}
+    </update>
+
+    <!--initUser-->
+    <insert id="initUser" parameterType="String">
+        insert into tiangong_draft.user(account, password, token) VALUES (#{account},#{password},#{token})
+    </insert>
+
+    <resultMap id="userRM" type="com.xlauncher.entity.User">
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="token" column="token"/>
+    </resultMap>
+</mapper>

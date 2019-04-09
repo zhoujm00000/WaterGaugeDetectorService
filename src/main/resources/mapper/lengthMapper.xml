@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlauncher.dao.LengthDao">
+    <!--getLength-->
+    <select id="getLength" resultMap="lengthRM">
+        SELECT * FROM tiangong_draft.length
+        WHERE SID=#{sid} AND channel=#{channel}
+    </select>
+
+    <!--getCount-->
+    <select id="getCount" resultType="int">
+        SELECT count(*) FROM tiangong_draft.length
+        WHERE SID=#{sid} AND channel=#{channel}
+    </select>
+
+    <!--deleteLength-->
+    <delete id="deleteLength" parameterType="int">
+        DELETE FROM tiangong_draft.length WHERE id=#{id}
+    </delete>
+
+    <!--emptyLength-->
+    <update id="emptyLength">
+        TRUNCATE TABLE tiangong_draft.length
+    </update>
+
+    <!--insertLength-->
+    <insert id="insertLength" parameterType="com.xlauncher.entity.Length">
+        INSERT INTO tiangong_draft.length(SID, channel, height)
+        VALUES (#{sid},#{channel},#{height})
+    </insert>
+
+    <!--updateLength-->
+    <update id="updateLength" parameterType="com.xlauncher.entity.Length">
+        UPDATE length
+        <set>
+            <if test="height !=null and height!=''">
+                height=#{height},
+            </if>
+            <if test="channel !=null and channel!=''">
+                channel=#{channel},
+            </if>
+            <if test="sid !=null and sid!=''">
+                SID=#{sid}
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <!--getLengthListForExcel-->
+    <select id="getLengthListForExcel" resultMap="lengthRM">
+        SELECT SID,channel,height FROM length
+        <where>
+            <if test="sid != 'undefined' and sid != '' ">
+                SID LIKE concat('%',#{sid},'%')
+            </if>
+            <if test="channel != '' ">
+                AND channel LIKE concat('%',#{channel},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--getLengthList-->
+    <select id="getLengthList" resultMap="lengthRM">
+        SELECT * FROM length
+        <where>
+            <if test="sid != 'undefined' and sid != '' ">
+                SID LIKE concat('%',#{sid},'%')
+            </if>
+            <if test="channel != '' ">
+                AND channel LIKE concat('%',#{channel},'%')
+            </if>
+        </where>
+        limit #{num},10
+    </select>
+
+    <!--count-->
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM length
+        <where>
+            <if test="sid != 'undefined' and sid != '' ">
+                SID LIKE concat('%',#{sid},'%')
+            </if>
+            <if test="channel != '' ">
+                AND channel LIKE concat('%',#{channel},'%')
+            </if>
+        </where>
+    </select>
+
+
+    <resultMap id="lengthRM" type="com.xlauncher.entity.Length">
+        <id property="id" column="id"/>
+        <result property="sid" column="SID"/>
+        <result property="channel" column="channel"/>
+        <result property="height" column="height"/>
+    </resultMap>
+</mapper>

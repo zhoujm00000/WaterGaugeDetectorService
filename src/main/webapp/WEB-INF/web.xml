@@ -1,0 +1,90 @@
+<!DOCTYPE web-app PUBLIC
+                "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+                "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+<display-name>Archetype Created Web Application</display-name>
+<!-- 如果是用mvn命令生成的xml，需要修改servlet版本为3.1 -->
+
+<!-- Spring + Spring MVC: 加载Spring上下文配置文件 -->
+<!-- 默认初始化参数为 /WEB-INF/applicationContext.xml -->
+<context-param>
+  <param-name>contextConfigLocation</param-name>
+  <param-value>classpath*:applicationContext.xml</param-value>
+</context-param>
+<context-param>
+  <param-name>webAppRootKey</param-name>
+  <param-value>web.root</param-value>
+</context-param>
+<context-param>
+  <param-name>log4jConfigLocation</param-name>
+  <param-value>classpath:log4j.properties</param-value>
+</context-param>
+<listener>
+  <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+</listener>
+<!-- 编码过滤器 -->
+<filter>
+  <filter-name>encodingFilter</filter-name>
+  <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+  <async-supported>true</async-supported>
+  <init-param>
+    <param-name>encoding</param-name>
+    <param-value>UTF-8</param-value>
+  </init-param>
+  <init-param>
+    <param-name>forceEncoding</param-name>
+    <param-value>true</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>encodingFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+<!-- Spring监听器，配置ContextLoaderListener -->
+<listener>
+  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+<!-- 防止Spring内存溢出监听器 -->
+<listener>
+  <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+</listener>
+<listener>
+  <listener-class>com.xlauncher.util.ServletInitUser</listener-class>
+</listener>
+  <listener>
+    <listener-class>com.xlauncher.util.userlogin.SessionManageListener</listener-class>
+  </listener>
+<!--servlet定义-->
+<!-- 配置DispatcherServlet -->
+<servlet>
+  <servlet-name>spring</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  <!-- 配置springMVC需要加载的配置文件
+        可以自定义servlet.xml配置文件的位置和名称，默认是WEB-INF目录下，名称为[<servlet-name>]-servlet.xml，如定义的servlet的名字为spring，则默认的加载配置文件的名字为spring-servlet.xml -->
+  <init-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath*:spring-*.xml</param-value>
+  </init-param>
+  <!-- 设置启动的优先级，这里表示启动容器初始化改Servlet -->
+  <load-on-startup>1</load-on-startup>
+  <async-supported>true</async-supported>
+</servlet>
+
+<!-- 通过将DispatcherServlet映射到/，声明了它会作为默认的servlet并且会处理所有请求，包括对静态资源的请求-->
+<servlet-mapping>
+  <servlet-name>spring</servlet-name>
+  <!-- 默认匹配所有的请求 -->
+  <url-pattern>/</url-pattern>
+</servlet-mapping>
+
+<welcome-file-list>
+  <welcome-file>index.jsp</welcome-file>
+</welcome-file-list>
+
+</web-app>
