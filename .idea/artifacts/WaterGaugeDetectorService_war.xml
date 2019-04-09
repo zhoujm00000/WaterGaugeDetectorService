@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" build-on-make="true" name="WaterGaugeDetectorService:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="WaterGaugeDetectorService.war">
+      <element id="artifact" artifact-name="WaterGaugeDetectorService:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="tiangong_draft@localhost">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.4">
+    <root id="1"/>
+    <schema id="2" parent="1" name="tiangong_draft">
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <schema id="3" parent="1" name="cms"/>
+    <schema id="4" parent="1" name="es"/>
+    <schema id="5" parent="1" name="hibernate"/>
+    <schema id="6" parent="1" name="information_schema"/>
+    <schema id="7" parent="1" name="mysql"/>
+    <schema id="8" parent="1" name="performance_schema"/>
+    <schema id="9" parent="1" name="sms"/>
+    <schema id="10" parent="1" name="springboot"/>
+    <schema id="11" parent="1" name="tiangong_cms"/>
+    <schema id="12" parent="1" name="tiangong_dim"/>
+    <schema id="13" parent="1" name="fcs"/>
+    <table id="14" parent="2" name="configuration"/>
+    <table id="15" parent="2" name="consume"/>
+    <table id="16" parent="2" name="length"/>
+    <table id="17" parent="2" name="predict"/>
+    <table id="18" parent="2" name="user"/>
+    <column id="19" parent="14" name="id">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="20" parent="14" name="options">
+      <Position>2</Position>
+      <Comment>配置选项</Comment>
+      <DataType>varchar(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="21" parent="14" name="params">
+      <Position>3</Position>
+      <Comment>参数</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <key id="22" parent="14" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id
+options</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="23" parent="15" name="id">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="24" parent="15" name="start_time">
+      <Position>2</Position>
+      <Comment>读取数据的开始时间</Comment>
+      <DataType>datetime|0</DataType>
+    </column>
+    <column id="25" parent="15" name="consume_time">
+      <Position>3</Position>
+      <Comment>读取数据的消耗时间，单位毫秒</Comment>
+      <DataType>int(50)|0</DataType>
+    </column>
+    <key id="26" parent="15" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="27" parent="16" name="id">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="28" parent="16" name="SID">
+      <Position>2</Position>
+      <DataType>varchar(20)|0</DataType>
+    </column>
+    <column id="29" parent="16" name="channel">
+      <Position>3</Position>
+      <DataType>int(4)|0</DataType>
+    </column>
+    <column id="30" parent="16" name="height">
+      <Position>4</Position>
+      <DataType>int(8)|0</DataType>
+    </column>
+    <key id="31" parent="16" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="32" parent="17" name="id">
+      <Position>1</Position>
+      <Comment>主键id</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="33" parent="17" name="collect_time">
+      <Position>2</Position>
+      <Comment>采集时间</Comment>
+      <DataType>datetime|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="34" parent="17" name="channel">
+      <Position>3</Position>
+      <Comment>设备</Comment>
+      <DataType>int(4)|0</DataType>
+    </column>
+    <column id="35" parent="17" name="SID">
+      <Position>4</Position>
+      <Comment>站点编号</Comment>
+      <DataType>varchar(20)|0</DataType>
+    </column>
+    <column id="36" parent="17" name="identify">
+      <Position>5</Position>
+      <Comment>预测数据</Comment>
+      <DataType>float(8)|0</DataType>
+    </column>
+    <column id="37" parent="17" name="check">
+      <Position>6</Position>
+      <Comment>反馈数据</Comment>
+      <DataType>float(8)|0</DataType>
+    </column>
+    <column id="38" parent="17" name="source">
+      <Position>7</Position>
+      <Comment>图片数据</Comment>
+      <DataType>mediumblob|0</DataType>
+    </column>
+    <column id="39" parent="17" name="status">
+      <Position>8</Position>
+      <Comment>图片是否有遮挡，1有遮挡，0无遮挡</Comment>
+      <DataType>int(4)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="40" parent="17" name="picture">
+      <Position>9</Position>
+      <Comment>存储缩略图</Comment>
+      <DataType>mediumblob|0</DataType>
+    </column>
+    <column id="41" parent="17" name="identify_description">
+      <Position>10</Position>
+      <Comment>预测异常图片信息描述(正常、无水尺异常、水尺异常、刻度异常)</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="42" parent="17" name="check_description">
+      <Position>11</Position>
+      <Comment>反馈异常信息描述(正常、无水尺异常、水尺异常、刻度异常)</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <key id="43" parent="17" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="44" parent="18" name="account">
+      <Position>1</Position>
+      <Comment>账号</Comment>
+      <DataType>varchar(25)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="45" parent="18" name="password">
+      <Position>2</Position>
+      <Comment>密码</Comment>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="46" parent="18" name="token">
+      <Position>3</Position>
+      <Comment>令牌</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <key id="47" parent="18" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>account</ColNames>
+      <Primary>1</Primary>
+    </key>
+  </database-model>
+</dataSource>
